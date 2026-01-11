@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Personal media gallery">
+    <title>Gallery</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/gallery.css">
+    <script src="js/media-catalog.js"></script>
+    <script src="js/gallery.js" defer></script>
+</head>
+<body>
+    <div class="app">
+        <button class="sidebar-toggle" type="button" aria-label="Toggle navigation">☰</button>
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h1 class="site-logo">
+                    <span class="logo-icon">▶</span>
+                    <span class="logo-text">Lite Media</span>
+                </h1>
+            </div>
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="index.html" class="nav-link nav-link--active">Gallery</a>
+                </li>
+                <li class="nav-item">
+                    <a href="files.html" class="nav-link">Files</a>
+                </li>
+                <li class="nav-item">
+                    <a href="about.html" class="nav-link">About</a>
+                </li>
+                <li class="nav-item">
+                    <a href="links.html" class="nav-link">Links</a>
+                </li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <div class="gallery">
+                <!-- Media will be loaded automatically from /media/ folders -->
+                <!-- If nginx autoindex is not enabled, add cards manually here -->
+            </div>
+        </main>
+
+        <aside class="modal" hidden>
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <button class="modal-close" type="button" aria-label="Close">×</button>
+                <div class="modal-media"></div>
+            </div>
+        </aside>
+    </div>
+</body>
+</html>

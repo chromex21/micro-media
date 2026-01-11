@@ -1,0 +1,406 @@
+/* Gallery container */
+.gallery {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    min-height: 100vh;
+    will-change: transform;
+}
+
+/* Pulling indicator */
+.gallery.pulling {
+    /* No transition during pull for immediate feedback */
+}
+
+.gallery:not(.pulling) {
+    transition: transform 0.3s ease-out;
+}
+
+/* Pull to refresh indicator */
+.pull-to-refresh {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%) translateY(-60px);
+    background-color: var(--bg-secondary);
+    padding: 10px 20px;
+    border-radius: 20px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+    z-index: 10000;
+    transition: transform 0.2s ease-out;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    pointer-events: none;
+    opacity: 1;
+    border: 1px solid var(--border-color);
+}
+
+.pull-to-refresh.visible {
+    transform: translateX(-50%) translateY(20px);
+    opacity: 1;
+}
+
+.pull-to-refresh.refreshing {
+    transform: translateX(-50%) translateY(20px);
+    opacity: 1;
+}
+
+.refresh-spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border-color);
+    border-top-color: var(--accent-color);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Media card */
+.media-card {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.media-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.media-container {
+    position: relative;
+    width: 100%;
+    background-color: #000000;
+    overflow: hidden;
+    /* Default to square (Instagram post style) */
+    aspect-ratio: 1 / 1;
+    max-height: 600px;
+}
+
+/* Portrait videos (TikTok/Reels style) */
+.media-container.portrait {
+    aspect-ratio: 9 / 16;
+    max-height: 100vh;
+}
+
+/* Landscape videos */
+.media-container.landscape {
+    aspect-ratio: 16 / 9;
+    max-height: 600px;
+}
+
+.media-item {
+    width: 100%;
+    height: 100%;
+    display: block;
+    /* Default contain to prevent cropping */
+    object-fit: contain;
+    user-select: none;
+    -webkit-user-select: none;
+    background-color: #000000;
+}
+
+/* Use cover for portrait videos to fill screen */
+.media-container.portrait .media-item {
+    object-fit: cover;
+}
+
+/* Video specific */
+.media-card[data-type="video"] .media-item {
+    /* Allow pointer events for play/pause */
+}
+
+.media-card[data-type="video"] .media-item::-webkit-media-controls {
+    display: none !important;
+}
+
+.media-card[data-type="video"] .media-item::-webkit-media-controls-enclosure {
+    display: none !important;
+}
+
+/* Video overlay controls */
+.video-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+}
+
+.media-container:hover .video-overlay {
+    opacity: 1;
+}
+
+.video-play-btn {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #000;
+    pointer-events: all;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.video-play-btn:hover {
+    transform: scale(1.1);
+    background-color: rgba(255, 255, 255, 1);
+}
+
+.video-play-btn:active {
+    transform: scale(0.95);
+}
+
+/* Video controls bar */
+.video-controls {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+    padding: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.media-container:hover .video-controls,
+.video-controls.show {
+    opacity: 1;
+}
+
+.video-control-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.video-control-btn:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.video-control-btn:active {
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+.video-progress {
+    flex: 1;
+    height: 4px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    position: relative;
+    cursor: pointer;
+}
+
+.video-progress-bar {
+    height: 100%;
+    background-color: var(--accent-color);
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.1s linear;
+}
+
+/* Video playing state */
+.media-container.playing .video-play-btn {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Caption */
+.media-caption {
+    padding: var(--spacing-md);
+}
+
+.media-title {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-xs);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.media-metadata {
+    display: flex;
+    gap: var(--spacing-md);
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: var(--spacing-xs);
+}
+
+.metadata-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal[hidden] {
+    display: none;
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-overlay);
+    cursor: pointer;
+}
+
+.modal-content {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+    z-index: 1001;
+}
+
+.modal-close {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    font-size: 32px;
+    color: var(--text-inverse);
+    padding: var(--spacing-sm);
+    line-height: 1;
+    opacity: 0.8;
+    transition: opacity var(--transition-speed) ease;
+}
+
+.modal-close:hover {
+    opacity: 1;
+}
+
+.modal-media {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-media img,
+.modal-media video {
+    max-width: 90vw;
+    max-height: 90vh;
+    width: auto;
+    height: auto;
+    display: block;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .gallery {
+        gap: 0;
+    }
+    
+    .media-card {
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        border-top: none;
+        /* Better touch targets */
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    .media-card:hover {
+        transform: none;
+        box-shadow: none;
+    }
+    
+    .media-card:first-child {
+        border-top: 1px solid var(--border-color);
+    }
+    
+    /* Adjust container for mobile */
+    .media-container {
+        max-height: none;
+        /* Prevent accidental text selection */
+        -webkit-user-select: none;
+        user-select: none;
+    }
+    
+    /* Better aspect ratios on mobile */
+    .media-container.portrait {
+        aspect-ratio: 9 / 16;
+        max-height: 85vh;
+    }
+    
+    .media-container.landscape {
+        aspect-ratio: 16 / 9;
+    }
+    
+    /* Smaller controls on mobile */
+    .video-control-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+    
+    .video-play-btn {
+        width: 56px;
+        height: 56px;
+        font-size: 20px;
+    }
+    
+    /* Make caption more compact on mobile */
+    .media-caption {
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+    
+    .media-title {
+        font-size: 13px;
+    }
+    
+    .media-metadata {
+        font-size: 11px;
+    }
+    
+    .modal-close {
+        top: var(--spacing-md);
+        right: var(--spacing-md);
+    }
+}

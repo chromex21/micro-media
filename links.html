@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Links - Lite Media</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <style>
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: var(--spacing-lg);
+            padding: var(--spacing-lg) 0;
+        }
+        
+        .link-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .link-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+        
+        .link-preview-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: linear-gradient(135deg, var(--accent-color) 0%, #667eea 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+        }
+        
+        .link-preview-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .link-card-content {
+            padding: var(--spacing-md);
+        }
+        
+        .link-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+            color: var(--text-primary);
+        }
+        
+        .link-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-sm);
+            line-height: 1.5;
+        }
+        
+        .link-url {
+            font-size: 12px;
+            color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-xxl) var(--spacing-lg);
+            color: var(--text-secondary);
+        }
+        
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: var(--spacing-md);
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <header>
+            <div class="header-content">
+                <h1>🔗 Links</h1>
+                <p>Useful resources and interesting finds</p>
+            </div>
+        </header>
+        
+        <main>
+            <div id="links-container" class="links-grid">
+                <!-- Links will be loaded here -->
+            </div>
+        </main>
+    </div>
+    
+    <nav class="nav-bar">
+        <a href="index.html" class="nav-item">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-label">Home</span>
+        </a>
+        <a href="files.html" class="nav-item">
+            <span class="nav-icon">📁</span>
+            <span class="nav-label">Files</span>
+        </a>
+        <a href="links.html" class="nav-item active">
+            <span class="nav-icon">🔗</span>
+            <span class="nav-label">Links</span>
+        </a>
+        <a href="about.html" class="nav-item">
+            <span class="nav-icon">ℹ️</span>
+            <span class="nav-label">About</span>
+        </a>
+    </nav>
+    
+    <script>
+        async function renderLinks() {
+            const container = document.getElementById('links-container');
+            let linksCatalog = [];
+            
+            // Try to load from storage
+            try {
+                const linksData = await window.storage.get('site-links');
+                if (linksData && linksData.value) {
+                    linksCatalog = JSON.parse(linksData.value);
+                }
+            } catch (error) {
+                console.log('No links in storage');
+            }
+            
+            if (linksCatalog.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <div class="empty-state-icon">🔗</div>
+                        <p>No links yet. Add some in the admin panel!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = '';
+            linksCatalog.forEach(link => {
+                const card = createLinkCard(link);
+                container.appendChild(card);
+            });
+        }
+        
+        function createLinkCard(link) {
+            const card = document.createElement('a');
+            card.className = 'link-card';
+            card.href = link.url;
+            card.target = '_blank';
+            card.rel = 'noopener noreferrer';
+            
+            let imageHtml;
+            if (link.image) {
+                imageHtml = `<img src="${link.image}" alt="${link.title}">`;
+            } else {
+                const emoji = getEmojiForUrl(link.url);
+                imageHtml = `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--accent-color) 0%, #667eea 100%);">${emoji}</div>`;
+            }
+            
+            card.innerHTML = `
+                <div class="link-preview-image">
+                    ${imageHtml}
+                </div>
+                <div class="link-card-content">
+                    <h3 class="link-title">${link.title}</h3>
+                    ${link.desc ? `<p class="link-description">${link.desc}</p>` : ''}
+                    <div class="link-url">
+                        <span>🌐</span>
+                        <span>${getDomainFromUrl(link.url)}</span>
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+        
+        function getDomainFromUrl(url) {
+            try {
+                const urlObj = new URL(url);
+                return urlObj.hostname.replace('www.', '');
+            } catch {
+                return url;
+            }
+        }
+        
+        function getEmojiForUrl(url) {
+            const urlLower = url.toLowerCase();
+            if (urlLower.includes('github')) return '💻';
+            if (urlLower.includes('youtube') || urlLower.includes('youtu.be')) return '🎥';
+            if (urlLower.includes('twitter') || urlLower.includes('x.com')) return '🐦';
+            if (urlLower.includes('instagram')) return '📷';
+            if (urlLower.includes('linkedin')) return '💼';
+            if (urlLower.includes('facebook')) return '👥';
+            if (urlLower.includes('reddit')) return '🤖';
+            if (urlLower.includes('medium') || urlLower.includes('blog')) return '✍️';
+            if (urlLower.includes('docs') || urlLower.includes('documentation')) return '📚';
+            if (urlLower.includes('news')) return '📰';
+            if (urlLower.includes('shop') || urlLower.includes('store')) return '🛒';
+            return '🔗';
+        }
+        
+        renderLinks();
+    </script>
+</body>
+</html>

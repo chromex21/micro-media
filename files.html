@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Files - Lite Media</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <style>
+        .files-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: var(--spacing-md);
+            padding: var(--spacing-lg) 0;
+        }
+        
+        .file-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .file-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .file-icon {
+            font-size: 48px;
+            margin-bottom: var(--spacing-sm);
+            text-align: center;
+        }
+        
+        .file-name {
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+            font-size: 16px;
+            color: var(--text-primary);
+        }
+        
+        .file-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-sm);
+            line-height: 1.4;
+        }
+        
+        .file-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-secondary);
+            padding-top: var(--spacing-sm);
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            background: var(--accent-color);
+            color: white;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 500;
+            transition: opacity 0.2s;
+            margin-top: var(--spacing-sm);
+        }
+        
+        .download-btn:hover {
+            opacity: 0.9;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-xxl) var(--spacing-lg);
+            color: var(--text-secondary);
+        }
+        
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: var(--spacing-md);
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <header>
+            <div class="header-content">
+                <h1>📁 Files</h1>
+                <p>Download documents and resources</p>
+            </div>
+        </header>
+        
+        <main>
+            <div id="files-container" class="files-grid">
+                <!-- Files will be loaded here -->
+            </div>
+        </main>
+    </div>
+    
+    <nav class="nav-bar">
+        <a href="index.html" class="nav-item">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-label">Home</span>
+        </a>
+        <a href="files.html" class="nav-item active">
+            <span class="nav-icon">📁</span>
+            <span class="nav-label">Files</span>
+        </a>
+        <a href="links.html" class="nav-item">
+            <span class="nav-icon">🔗</span>
+            <span class="nav-label">Links</span>
+        </a>
+        <a href="about.html" class="nav-item">
+            <span class="nav-icon">ℹ️</span>
+            <span class="nav-label">About</span>
+        </a>
+    </nav>
+    
+    <script>
+        async function renderFiles() {
+            const container = document.getElementById('files-container');
+            let filesCatalog = [];
+            
+            // Try to load from storage
+            try {
+                const filesData = await window.storage.get('site-files');
+                if (filesData && filesData.value) {
+                    filesCatalog = JSON.parse(filesData.value);
+                }
+            } catch (error) {
+                console.log('No files in storage');
+            }
+            
+            if (filesCatalog.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <div class="empty-state-icon">📁</div>
+                        <p>No files yet. Add some in the admin panel!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = '';
+            filesCatalog.forEach(file => {
+                const card = createFileCard(file);
+                container.appendChild(card);
+            });
+        }
+        
+        function createFileCard(file) {
+            const card = document.createElement('div');
+            card.className = 'file-card';
+            
+            const icon = getFileIcon(file.type);
+            
+            card.innerHTML = `
+                <div class="file-icon">${icon}</div>
+                <div class="file-name">${file.name}</div>
+                ${file.desc ? `<div class="file-description">${file.desc}</div>` : ''}
+                <div class="file-meta">
+                    <span>${file.type.toUpperCase()}</span>
+                    ${file.size ? `<span>${file.size}</span>` : ''}
+                </div>
+                <a href="${file.path}" download class="download-btn">
+                    <span>⬇️</span>
+                    <span>Download</span>
+                </a>
+            `;
+            
+            return card;
+        }
+        
+        function getFileIcon(type) {
+            const icons = {
+                'pdf': '📄',
+                'doc': '📝',
+                'docx': '📝',
+                'xls': '📊',
+                'xlsx': '📊',
+                'ppt': '📊',
+                'pptx': '📊',
+                'zip': '📦',
+                'rar': '📦',
+                'txt': '📃',
+                'jpg': '🖼️',
+                'jpeg': '🖼️',
+                'png': '🖼️',
+                'gif': '🖼️',
+                'mp4': '🎥',
+                'mp3': '🎵',
+                'default': '📄'
+            };
+            
+            return icons[type.toLowerCase()] || icons['default'];
+        }
+        
+        renderFiles();
+    </script>
+</body>
+</html>

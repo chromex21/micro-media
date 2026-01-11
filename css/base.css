@@ -1,0 +1,87 @@
+/* CSS Reset */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.5;
+    color: var(--text-primary);
+    background-color: var(--bg-primary);
+    overflow-x: hidden;
+}
+
+img, video {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    background: none;
+}
+
+ul {
+    list-style: none;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+body.modal-open {
+    overflow: hidden;
+}
+
+/* CSS Variables */
+:root {
+    --bg-primary: #fafafa;
+    --bg-secondary: #ffffff;
+    --bg-overlay: rgba(0, 0, 0, 0.85);
+    
+    --text-primary: #262626;
+    --text-secondary: #8e8e8e;
+    --text-inverse: #ffffff;
+    
+    --border-color: #dbdbdb;
+    --accent-color: #0095f6;
+    
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    
+    --radius-sm: 3px;
+    --radius-md: 8px;
+    
+    --sidebar-width: 240px;
+    --transition-speed: 0.2s;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-primary: #000000;
+        --bg-secondary: #121212;
+        --bg-overlay: rgba(0, 0, 0, 0.95);
+        
+        --text-primary: #fafafa;
+        --text-secondary: #a8a8a8;
+        
+        --border-color: #363636;
+    }
+}

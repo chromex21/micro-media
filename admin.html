@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Lite Media</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <style>
+        .admin-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--spacing-xl);
+        }
+        
+        .admin-header {
+            margin-bottom: var(--spacing-xl);
+            padding-bottom: var(--spacing-lg);
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        .admin-header h1 {
+            font-size: 28px;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .admin-header p {
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-xl);
+            border-bottom: 2px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: var(--spacing-md) var(--spacing-lg);
+            background: none;
+            border: none;
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+        
+        .tab.active {
+            color: var(--accent-color);
+            border-bottom-color: var(--accent-color);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .section h2 {
+            font-size: 20px;
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-md);
+        }
+        
+        .media-item {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            position: relative;
+        }
+        
+        .media-preview {
+            width: 100%;
+            height: 150px;
+            background: #000;
+            border-radius: var(--radius-sm);
+            margin-bottom: var(--spacing-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .media-preview img,
+        .media-preview video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .media-filename {
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: var(--spacing-sm);
+            color: var(--text-primary);
+            word-break: break-word;
+        }
+        
+        .form-group {
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 4px;
+            color: var(--text-secondary);
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            font-size: 13px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+        }
+        
+        .btn-small {
+            padding: 4px 12px;
+            font-size: 12px;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-sm);
+        }
+        
+        .alert {
+            padding: var(--spacing-md);
+            border-radius: var(--radius-sm);
+            margin-bottom: var(--spacing-md);
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .link-item, .file-item {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-top: var(--spacing-xs);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-xl);
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: var(--spacing-md);
+            opacity: 0.5;
+        }
+
+        .save-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background: #28a745;
+            color: white;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease-out;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .save-indicator.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <div class="admin-header">
+            <h1>⚙️ Lite Media Admin Panel</h1>
+            <p>Manage your entire site - All changes save automatically!</p>
+        </div>
+        
+        <div id="alert-container"></div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('gallery')">🎬 Gallery</button>
+            <button class="tab" onclick="switchTab('files')">📁 Files</button>
+            <button class="tab" onclick="switchTab('links')">🔗 Links</button>
+            <button class="tab" onclick="switchTab('about')">ℹ️ About</button>
+        </div>
+        
+        <!-- GALLERY TAB -->
+        <div id="gallery-tab" class="tab-content active">
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="video-count">0</div>
+                    <div class="stat-label">Videos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="image-count">0</div>
+                    <div class="stat-label">Images</div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>📹 Videos</h2>
+                <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: var(--spacing-md);">
+                    Add video files to <code>media/videos/sd/</code> folder, then click scan to add them here.
+                </p>
+                <button class="btn" onclick="scanForNewMedia()" style="margin-bottom: var(--spacing-md);">
+                    🔄 Scan for New Videos & Images
+                </button>
+                
+                <div id="videos-grid" class="media-grid"></div>
+            </div>
+            
+            <div class="section">
+                <h2>🖼️ Images</h2>
+                <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: var(--spacing-md);">
+                    Add image files to <code>media/images/full/</code> folder, then use the scan button above.
+                </p>
+                
+                <div id="images-grid" class="media-grid"></div>
+            </div>
+        </div>
+        
+        <!-- FILES TAB -->
+        <div id="files-tab" class="tab-content">
+            <div class="section">
+                <h2>📄 Files Management</h2>
+                <button class="btn" onclick="addNewFile()" style="margin-bottom: var(--spacing-md);">➕ Add New File</button>
+                <div id="files-list"></div>
+            </div>
+        </div>
+        
+        <!-- LINKS TAB -->
+        <div id="links-tab" class="tab-content">
+            <div class="section">
+                <h2>🔗 Links</h2>
+                <button class="btn" onclick="addNewLink()" style="margin-bottom: var(--spacing-md);">➕ Add New Link</button>
+                <div id="links-list"></div>
+            </div>
+        </div>
+        
+        <!-- ABOUT TAB -->
+        <div id="about-tab" class="tab-content">
+            <div class="section">
+                <h2>ℹ️ About Page</h2>
+                <div class="form-group">
+                    <label>About Content (HTML supported)</label>
+                    <textarea id="about-content" rows="15" placeholder="Write about yourself or your site..."></textarea>
+                </div>
+                <button class="btn" onclick="saveAbout()">💾 Save About Page</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="save-indicator" id="save-indicator">✓ Saved!</div>
+    
+    <script src="js/media-catalog.js"></script>
+    <script>
+        let siteData = {
+            videos: [],
+            images: [],
+            links: [],
+            files: [],
+            about: ''
+        };
+        
+        async function init() {
+            await loadFromStorage();
+            updateStats();
+        }
+        
+        async function loadFromStorage() {
+            try {
+                const videosData = await window.storage.get('media-videos');
+                if (videosData && videosData.value) {
+                    siteData.videos = JSON.parse(videosData.value);
+                } else {
+                    await loadFromCatalog();
+                }
+                
+                const imagesData = await window.storage.get('media-images');
+                if (imagesData && imagesData.value) {
+                    siteData.images = JSON.parse(imagesData.value);
+                }
+                
+                const linksData = await window.storage.get('site-links');
+                if (linksData && linksData.value) {
+                    siteData.links = JSON.parse(linksData.value);
+                }
+                
+                const filesData = await window.storage.get('site-files');
+                if (filesData && filesData.value) {
+                    siteData.files = JSON.parse(filesData.value);
+                }
+                
+                const aboutData = await window.storage.get('site-about');
+                if (aboutData && aboutData.value) {
+                    siteData.about = aboutData.value;
+                    document.getElementById('about-content').value = siteData.about;
+                }
+                
+                renderAll();
+                showAlert(`✅ Loaded ${siteData.videos.length} videos, ${siteData.images.length} images, ${siteData.links.length} links!`, 'success');
+            } catch (error) {
+                console.error('Storage error:', error);
+                showAlert('⚠️ Loading from catalog...', 'info');
+                await loadFromCatalog();
+            }
+        }
+        
+        async function loadFromCatalog() {
+            if (typeof mediaCatalog !== 'undefined') {
+                siteData.videos = [];
+                siteData.images = [];
+                
+                if (mediaCatalog.videos) {
+                    mediaCatalog.videos.forEach(item => {
+                        if (typeof item === 'string') {
+                            siteData.videos.push({ file: item, title: '', desc: '' });
+                        } else {
+                            siteData.videos.push({
+                                file: item.file,
+                                title: item.title || '',
+                                desc: item.desc || ''
+                            });
+                        }
+                    });
+                }
+                
+                if (mediaCatalog.images) {
+                    mediaCatalog.images.forEach(item => {
+                        if (typeof item === 'string') {
+                            siteData.images.push({ file: item, title: '', desc: '' });
+                        } else {
+                            siteData.images.push({
+                                file: item.file,
+                                title: item.title || '',
+                                desc: item.desc || ''
+                            });
+                        }
+                    });
+                }
+                
+                await saveToStorage();
+                renderAll();
+                updateStats();
+            }
+        }
+        
+        async function saveToStorage() {
+            try {
+                await window.storage.set('media-videos', JSON.stringify(siteData.videos));
+                await window.storage.set('media-images', JSON.stringify(siteData.images));
+                await window.storage.set('site-links', JSON.stringify(siteData.links));
+                await window.storage.set('site-files', JSON.stringify(siteData.files));
+                await window.storage.set('site-about', siteData.about);
+                showSaveIndicator();
+                return true;
+            } catch (error) {
+                console.error('Save error:', error);
+                showAlert('❌ Failed to save. Please try again.', 'error');
+                return false;
+            }
+        }
+        
+        function showSaveIndicator() {
+            const indicator = document.getElementById('save-indicator');
+            indicator.classList.add('show');
+            setTimeout(() => indicator.classList.remove('show'), 2000);
+        }
+        
+        async function scanForNewMedia() {
+            showAlert('🔄 Scanning for new files...', 'info');
+            
+            if (typeof mediaCatalog !== 'undefined') {
+                const existingVideoFiles = new Set(siteData.videos.map(v => v.file));
+                const existingImageFiles = new Set(siteData.images.map(i => i.file));
+                
+                let newVideos = 0, newImages = 0;
+                
+                if (mediaCatalog.videos) {
+                    mediaCatalog.videos.forEach(item => {
+                        const filename = typeof item === 'string' ? item : item.file;
+                        if (!existingVideoFiles.has(filename)) {
+                            siteData.videos.push({
+                                file: filename,
+                                title: typeof item === 'object' ? (item.title || '') : '',
+                                desc: typeof item === 'object' ? (item.desc || '') : ''
+                            });
+                            newVideos++;
+                        }
+                    });
+                }
+                
+                if (mediaCatalog.images) {
+                    mediaCatalog.images.forEach(item => {
+                        const filename = typeof item === 'string' ? item : item.file;
+                        if (!existingImageFiles.has(filename)) {
+                            siteData.images.push({
+                                file: filename,
+                                title: typeof item === 'object' ? (item.title || '') : '',
+                                desc: typeof item === 'object' ? (item.desc || '') : ''
+                            });
+                            newImages++;
+                        }
+                    });
+                }
+                
+                if (newVideos > 0 || newImages > 0) {
+                    await saveToStorage();
+                    renderAll();
+                    updateStats();
+                    showAlert(`✅ Found ${newVideos} new video(s) and ${newImages} new image(s)!`, 'success');
+                } else {
+                    showAlert('✓ No new files found.', 'info');
+                }
+            }
+        }
+        
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(tabName + '-tab').classList.add('active');
+        }
+        
+        function renderAll() {
+            renderVideos();
+            renderImages();
+            renderLinks();
+            renderFiles();
+        }
+        
+        function renderVideos() {
+            const grid = document.getElementById('videos-grid');
+            if (siteData.videos.length === 0) {
+                grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🎥</div><p>No videos yet.</p></div>';
+                return;
+            }
+            
+            grid.innerHTML = '';
+            siteData.videos.forEach((video, index) => {
+                const item = document.createElement('div');
+                item.className = 'media-item';
+                item.innerHTML = `
+                    <div class="media-preview">
+                        <video src="media/videos/sd/${video.file}" muted></video>
+                    </div>
+                    <div class="media-filename">🎥 ${video.file}</div>
+                    <div class="form-group">
+                        <label>Title</label>
+                        <input type="text" value="${video.title || ''}" onchange="updateVideoTitle(${index}, this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea onchange="updateVideoDesc(${index}, this.value)">${video.desc || ''}</textarea>
+                    </div>
+                    <button class="btn btn-danger btn-small" onclick="removeVideo(${index})">🗑️ Remove</button>
+                `;
+                grid.appendChild(item);
+            });
+        }
+        
+        function renderImages() {
+            const grid = document.getElementById('images-grid');
+            if (siteData.images.length === 0) {
+                grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🖼️</div><p>No images yet.</p></div>';
+                return;
+            }
+            
+            grid.innerHTML = '';
+            siteData.images.forEach((image, index) => {
+                const item = document.createElement('div');
+                item.className = 'media-item';
+                item.innerHTML = `
+                    <div class="media-preview">
+                        <img src="media/images/full/${image.file}" alt="">
+                    </div>
+                    <div class="media-filename">🖼️ ${image.file}</div>
+                    <div class="form-group">
+                        <label>Title</label>
+                        <input type="text" value="${image.title || ''}" onchange="updateImageTitle(${index}, this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea onchange="updateImageDesc(${index}, this.value)">${image.desc || ''}</textarea>
+                    </div>
+                    <button class="btn btn-danger btn-small" onclick="removeImage(${index})">🗑️ Remove</button>
+                `;
+                grid.appendChild(item);
+            });
+        }
+        
+        async function updateVideoTitle(index, value) {
+            siteData.videos[index].title = value;
+            await saveToStorage();
+        }
+        
+        async function updateVideoDesc(index, value) {
+            siteData.videos[index].desc = value;
+            await saveToStorage();
+        }
+        
+        async function updateImageTitle(index, value) {
+            siteData.images[index].title = value;
+            await saveToStorage();
+        }
+        
+        async function updateImageDesc(index, value) {
+            siteData.images[index].desc = value;
+            await saveToStorage();
+        }
+        
+        async function removeVideo(index) {
+            if (confirm('Remove this video?')) {
+                siteData.videos.splice(index, 1);
+                await saveToStorage();
+                renderVideos();
+                updateStats();
+            }
+        }
+        
+        async function removeImage(index) {
+            if (confirm('Remove this image?')) {
+                siteData.images.splice(index, 1);
+                await saveToStorage();
+                renderImages();
+                updateStats();
+            }
+        }
+        
+        function updateStats() {
+            document.getElementById('video-count').textContent = siteData.videos.length;
+            document.getElementById('image-count').textContent = siteData.images.length;
+        }
+        
+        async function addNewLink() {
+            const url = prompt('Enter link URL (including https://):');
+            if (!url) return;
+            const title = prompt('Enter link title:') || url;
+            const desc = prompt('Enter description (optional):') || '';
+            
+            siteData.links.push({ url, title, desc, image: '' });
+            await saveToStorage();
+            renderLinks();
+            showAlert('✅ Link added!', 'success');
+        }
+        
+        function renderLinks() {
+            const list = document.getElementById('links-list');
+            if (siteData.links.length === 0) {
+                list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔗</div><p>No links yet.</p></div>';
+                return;
+            }
+            
+            list.innerHTML = '';
+            siteData.links.forEach((link, index) => {
+                const item = document.createElement('div');
+                item.className = 'link-item';
+                item.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <strong>${link.title}</strong>
+                        <button class="btn btn-danger btn-small" onclick="removeLink(${index})">🗑️</button>
+                    </div>
+                    <div style="color: var(--text-secondary); font-size: 13px;">${link.url}</div>
+                    ${link.desc ? `<div style="margin-top: 8px; font-size: 13px;">${link.desc}</div>` : ''}
+                `;
+                list.appendChild(item);
+            });
+        }
+        
+        async function removeLink(index) {
+            if (confirm('Remove this link?')) {
+                siteData.links.splice(index, 1);
+                await saveToStorage();
+                renderLinks();
+            }
+        }
+        
+        async function addNewFile() {
+            const name = prompt('File name (e.g., Document.pdf):');
+            if (!name) return;
+            const path = prompt('File path (e.g., files/Document.pdf):');
+            if (!path) return;
+            const desc = prompt('Description (optional):') || '';
+            const size = prompt('Size (e.g., 2.5 MB):') || '';
+            const type = name.split('.').pop().toLowerCase();
+            
+            siteData.files.push({ name, path, desc, size, type });
+            await saveToStorage();
+            renderFiles();
+            showAlert('✅ File added!', 'success');
+        }
+        
+        function renderFiles() {
+            const list = document.getElementById('files-list');
+            if (siteData.files.length === 0) {
+                list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📁</div><p>No files yet.</p></div>';
+                return;
+            }
+            
+            list.innerHTML = '';
+            siteData.files.forEach((file, index) => {
+                const item = document.createElement('div');
+                item.className = 'file-item';
+                item.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <strong>${file.name}</strong>
+                        <button class="btn btn-danger btn-small" onclick="removeFile(${index})">🗑️</button>
+                    </div>
+                    <div style="color: var(--text-secondary); font-size: 13px;">${file.path} ${file.size ? '• ' + file.size : ''}</div>
+                    ${file.desc ? `<div style="margin-top: 8px; font-size: 13px;">${file.desc}</div>` : ''}
+                `;
+                list.appendChild(item);
+            });
+        }
+        
+        async function removeFile(index) {
+            if (confirm('Remove this file?')) {
+                siteData.files.splice(index, 1);
+                await saveToStorage();
+                renderFiles();
+            }
+        }
+        
+        async function saveAbout() {
+            siteData.about = document.getElementById('about-content').value;
+            await saveToStorage();
+            showAlert('✅ About page saved!', 'success');
+        }
+        
+        function showAlert(message, type) {
+            const container = document.getElementById('alert-container');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            container.appendChild(alert);
+            setTimeout(() => alert.remove(), 5000);
+        }
+        
+        init();
+    </script>
+</body>
+</html>
