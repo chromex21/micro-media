@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+*.egg-info/
+
+# Media files (large, don't upload to git)
+media/videos/sd/*.mp4
+media/videos/sd/*.webm
+media/videos/sd/*.mov
+media/videos/sd/*.avi
+media/videos/sd/*.mkv
+media/images/full/*.jpg
+media/images/full/*.jpeg
+media/images/full/*.png
+media/images/full/*.gif
+media/images/full/*.webp
+media/images/full/*.bmp
+
+# Generated thumbnails
+media/videos/thumbs/*.jpg
+media/videos/thumbs/*.jpeg
+media/videos/thumbs/*.png
+media/images/thumbs/*.jpg
+media/images/thumbs/*.jpeg
+media/images/thumbs/*.png
+
+# Assets (user-generated)
+assets/*
+!assets/.gitkeep
+
+# Documents archive
+docs/archive/*
+!docs/archive/.gitkeep
+
+# Editor files
+*.swp
+*.swo
+*~
+.DS_Store
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# But keep the folder structure with .gitkeep files
+!**/.gitkeep

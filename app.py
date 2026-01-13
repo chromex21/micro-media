@@ -34,6 +34,7 @@ import hashlib
 # Add scripts directory to path
 sys.path.insert(0, str(Path(__file__).parent / 'scripts'))
 from cms import MediaCatalog
+from integrity_check import IntegrityChecker
 
 # ============================================================================
 # CONFIGURATION
@@ -253,6 +254,22 @@ def boot_sequence():
     print("\n" + "="*60)
     print("🚀 BOOT SEQUENCE STARTING (Background)")
     print("="*60)
+    
+    # Step 0: Integrity check
+    print("\n🔍 Running integrity check...")
+    try:
+        checker = IntegrityChecker(BASE_DIR)
+        is_healthy = checker.check()
+        
+        if not is_healthy:
+            print("\n⚠️  System integrity issues detected")
+            print("→ Attempting automatic repair...\n")
+            checker.repair(auto_confirm=True)
+            print("✅ Integrity restored\n")
+        else:
+            print("✅ Integrity check passed\n")
+    except Exception as e:
+        print(f"⚠️  Integrity check error (non-fatal): {e}\n")
     
     while boot_attempts < MAX_BOOT_RETRIES:
         boot_attempts += 1
