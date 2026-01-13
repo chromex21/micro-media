@@ -8,39 +8,138 @@
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/gallery.css">
+    <link rel="stylesheet" href="css/interactions.css">
+    <link rel="stylesheet" href="css/boot.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/mobile-header.css">
+    <script src="js/storage-polyfill.js"></script>
+    <script src="js/storage-events.js"></script>
+    <script src="js/boot.js"></script>
     <script src="js/media-catalog.js"></script>
+    <script src="js/gallery-interactions-helper.js"></script>
     <script src="js/gallery.js" defer></script>
+    <script src="js/gallery-feed-enhancements.js" defer></script>
+    <script src="js/interactions.js" defer></script>
+    <script src="js/mobile-header.js" defer></script>
+    <script src="js/ui-polish.js" defer></script>
+    <style>
+        .feed-header {
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .feed-header h1 {
+            font-size: 24px;
+            margin: 0;
+        }
+        
+        .feed-counter {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin: 4px 0 0 0;
+        }
+        
+        .feed-controls {
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            gap: var(--spacing-md);
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .feed-search-wrapper {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .feed-search {
+            width: 100%;
+            padding: 10px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            background: var(--bg-secondary);
+        }
+        
+        .feed-filter-select {
+            padding: 10px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            background: var(--bg-secondary);
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
+    <!-- Boot screen injected by boot.js -->
+    
     <div class="app">
         <button class="sidebar-toggle" type="button" aria-label="Toggle navigation">☰</button>
         <nav class="sidebar">
             <div class="sidebar-header">
-                <h1 class="site-logo">
+                <a href="index.html" class="site-logo">
                     <span class="logo-icon">▶</span>
                     <span class="logo-text">Lite Media</span>
-                </h1>
+                </a>
             </div>
             <ul class="nav-list">
                 <li class="nav-item">
-                    <a href="index.html" class="nav-link nav-link--active">Gallery</a>
+                    <a href="index.html" class="nav-link nav-link--active">
+                        <span>📱</span>
+                        <span>Feed</span>
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a href="files.html" class="nav-link">Files</a>
+                    <a href="files.html" class="nav-link">
+                        <span>📁</span>
+                        <span>Files</span>
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a href="about.html" class="nav-link">About</a>
+                    <a href="links.html" class="nav-link">
+                        <span>🔗</span>
+                        <span>Links</span>
+                    </a>
                 </li>
-                <li class="nav-item">
-                    <a href="links.html" class="nav-link">Links</a>
+                <li class="nav-item" style="margin-top: auto;">
+                    <a href="admin.html" class="nav-link" id="settings-btn">
+                        <span>⚙️</span>
+                        <span>Settings</span>
+                    </a>
                 </li>
             </ul>
         </nav>
 
         <main class="main-content">
+            <div class="feed-header">
+                <h1>Media Feed</h1>
+                <p class="feed-counter" id="feed-count">Loading...</p>
+            </div>
+            
+            <div class="feed-controls">
+                <div class="feed-search-wrapper">
+                    <input 
+                        type="search" 
+                        id="feed-search" 
+                        class="feed-search"
+                        placeholder="🔍 Search media..."
+                    >
+                </div>
+                <select id="feed-type-filter" class="feed-filter-select">
+                    <option value="all">All Media</option>
+                    <option value="image">Images</option>
+                    <option value="video">Videos</option>
+                </select>
+                <select id="feed-sort" class="feed-filter-select">
+                    <option value="recent">Recently Added</option>
+                    <option value="oldest">Oldest First</option>
+                </select>
+            </div>
+            
             <div class="gallery">
-                <!-- Media will be loaded automatically from /media/ folders -->
-                <!-- If nginx autoindex is not enabled, add cards manually here -->
+                <!-- Media will be loaded after boot sequence completes -->
             </div>
         </main>
 
@@ -52,5 +151,26 @@
             </div>
         </aside>
     </div>
+
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav">
+        <a href="index.html" class="mobile-nav-item active">
+            <span class="mobile-nav-icon">📱</span>
+            <span>Feed</span>
+        </a>
+        <a href="files.html" class="mobile-nav-item">
+            <span class="mobile-nav-icon">📁</span>
+            <span>Files</span>
+        </a>
+
+        <a href="links.html" class="mobile-nav-item">
+            <span class="mobile-nav-icon">🔗</span>
+            <span>Links</span>
+        </a>
+        <a href="admin.html" class="mobile-nav-item">
+            <span class="mobile-nav-icon">⚙️</span>
+            <span>Settings</span>
+        </a>
+    </nav>
 </body>
 </html>

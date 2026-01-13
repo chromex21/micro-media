@@ -6,7 +6,79 @@
     <title>Links - Lite Media</title>
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/mobile-header.css">
+    <script src="js/storage-polyfill.js"></script>
+    <script src="js/storage-events.js"></script>
     <style>
+        .search-container {
+            margin-bottom: var(--spacing-lg);
+            position: sticky;
+            top: 0;
+            background: var(--bg-primary);
+            padding: var(--spacing-md) 0;
+            z-index: 10;
+        }
+        
+        .search-box {
+            position: relative;
+            max-width: 400px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 12px 16px 12px 48px;
+            font-size: 16px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            transition: border-color 0.2s;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+        
+        .search-clear {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 4px;
+            display: none;
+            transition: color 0.2s;
+        }
+        
+        .search-clear:hover {
+            color: var(--text-primary);
+        }
+        
+        .search-clear.visible {
+            display: block;
+        }
+        
+        .search-results-info {
+            margin-top: var(--spacing-sm);
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
         .links-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -88,62 +160,209 @@
     </style>
 </head>
 <body>
-    <div class="content-wrapper">
-        <header>
-            <div class="header-content">
-                <h1>🔗 Links</h1>
-                <p>Useful resources and interesting finds</p>
+    <div class="app">
+        <button class="sidebar-toggle" type="button" aria-label="Toggle navigation">☰</button>
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="site-logo">
+                    <span class="logo-icon">▶</span>
+                    <span class="logo-text">Lite Media</span>
+                </a>
             </div>
-        </header>
-        
-        <main>
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="index.html" class="nav-link">
+                        <span>📱</span>
+                        <span>Feed</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="files.html" class="nav-link">
+                        <span>📁</span>
+                        <span>Files</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="links.html" class="nav-link nav-link--active">
+                        <span>🔗</span>
+                        <span>Links</span>
+                    </a>
+                </li>
+                <li class="nav-item" style="margin-top: auto;">
+                    <a href="admin.html" class="nav-link" id="settings-btn">
+                        <span>⚙️</span>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <div class="files-page-header" style="display: flex; justify-content: space-between; align-items: center; padding: var(--spacing-lg); border-bottom: 1px solid var(--border-color); margin-bottom: 0;">
+                <div>
+                    <h1 style="font-size: 24px; margin: 0;">Links Directory</h1>
+                    <p id="link-count" style="font-size: 14px; color: var(--text-secondary); margin: 4px 0 0 0;">Loading...</p>
+                </div>
+            </div>
+            
+            <!-- Search and Filter Bar -->
+            <div class="files-controls" style="padding: var(--spacing-md) var(--spacing-lg); border-bottom: 1px solid var(--border-color); display: flex; gap: var(--spacing-md); flex-wrap: wrap; align-items: center;">
+                <div style="flex: 1; min-width: 200px;">
+                    <input 
+                        type="search" 
+                        id="links-search" 
+                        placeholder="🔍 Search links..." 
+                        style="width: 100%; padding: 10px 16px; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 14px; background: var(--bg-secondary);"
+                    >
+                </div>
+                <select 
+                    id="link-category-filter" 
+                    style="padding: 10px 16px; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 14px; background: var(--bg-secondary); cursor: pointer;"
+                >
+                    <option value="all">All Categories</option>
+                    <option value="social">Social Media</option>
+                    <option value="dev">Development</option>
+                    <option value="docs">Documentation</option>
+                    <option value="video">Video</option>
+                    <option value="other">Other</option>
+                </select>
+                <select 
+                    id="link-sort" 
+                    style="padding: 10px 16px; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 14px; background: var(--bg-secondary); cursor: pointer;"
+                >
+                    <option value="recent">Recently Added</option>
+                    <option value="title-asc">Title (A-Z)</option>
+                    <option value="title-desc">Title (Z-A)</option>
+                </select>
+            </div>
+            
+            <div class="search-container" style="display: none;">
+                <div class="search-box">
+                    <!-- Hidden old search -->
+                </div>
+            </div>
+            
             <div id="links-container" class="links-grid">
                 <!-- Links will be loaded here -->
             </div>
         </main>
     </div>
     
-    <nav class="nav-bar">
-        <a href="index.html" class="nav-item">
-            <span class="nav-icon">🏠</span>
-            <span class="nav-label">Home</span>
-        </a>
-        <a href="files.html" class="nav-item">
-            <span class="nav-icon">📁</span>
-            <span class="nav-label">Files</span>
-        </a>
-        <a href="links.html" class="nav-item active">
-            <span class="nav-icon">🔗</span>
-            <span class="nav-label">Links</span>
-        </a>
-        <a href="about.html" class="nav-item">
-            <span class="nav-icon">ℹ️</span>
-            <span class="nav-label">About</span>
-        </a>
-    </nav>
-    
+    <script src="js/gallery.js" defer></script>
+    <script src="js/pull-to-refresh.js"></script>
     <script>
+        let allLinks = [];
+        let filteredLinks = [];
+        
+        function updateLinkCount() {
+            const countEl = document.getElementById('link-count');
+            const visibleLinks = filteredLinks.length;
+            const totalLinks = allLinks.length;
+            
+            if (visibleLinks === totalLinks) {
+                countEl.textContent = `${totalLinks} link${totalLinks !== 1 ? 's' : ''}`;
+            } else {
+                countEl.textContent = `${visibleLinks} of ${totalLinks} links`;
+            }
+        }
+        
+        function getCategoryForUrl(url) {
+            const urlLower = url.toLowerCase();
+            if (urlLower.includes('github') || urlLower.includes('stackoverflow') || urlLower.includes('gitlab')) return 'dev';
+            if (urlLower.includes('youtube') || urlLower.includes('youtu.be') || urlLower.includes('vimeo')) return 'video';
+            if (urlLower.includes('twitter') || urlLower.includes('x.com') || urlLower.includes('instagram') || urlLower.includes('facebook') || urlLower.includes('linkedin')) return 'social';
+            if (urlLower.includes('docs') || urlLower.includes('documentation') || urlLower.includes('wiki')) return 'docs';
+            return 'other';
+        }
+        
+        // Wait for storage to be ready
+        function waitForStorage() {
+            return new Promise((resolve) => {
+                if (window.storage && window.storage.get) {
+                    resolve();
+                    return;
+                }
+                const checkInterval = setInterval(() => {
+                    if (window.storage && window.storage.get) {
+                        clearInterval(checkInterval);
+                        resolve();
+                    }
+                }, 50);
+                // Timeout after 5 seconds
+                setTimeout(() => {
+                    clearInterval(checkInterval);
+                    resolve();
+                }, 5000);
+            });
+        }
+        
+        async function filterAndRenderLinks() {
+            const searchTerm = document.getElementById('links-search').value.toLowerCase();
+            const categoryFilter = document.getElementById('link-category-filter').value;
+            const sortBy = document.getElementById('link-sort').value;
+            
+            // Filter
+            filteredLinks = allLinks.filter(link => {
+                const matchesSearch = !searchTerm || 
+                    link.title.toLowerCase().includes(searchTerm) ||
+                    (link.desc && link.desc.toLowerCase().includes(searchTerm)) ||
+                    link.url.toLowerCase().includes(searchTerm);
+                
+                const linkCategory = getCategoryForUrl(link.url);
+                const matchesCategory = categoryFilter === 'all' || linkCategory === categoryFilter;
+                
+                return matchesSearch && matchesCategory;
+            });
+            
+            // Sort
+            filteredLinks.sort((a, b) => {
+                switch(sortBy) {
+                    case 'title-asc':
+                        return a.title.localeCompare(b.title);
+                    case 'title-desc':
+                        return b.title.localeCompare(a.title);
+                    case 'recent':
+                    default:
+                        // Most recent first (if uploadDate exists)
+                        const aDate = a.uploadDate || 0;
+                        const bDate = b.uploadDate || 0;
+                        return bDate - aDate;
+                }
+            });
+            
+            renderLinks();
+        }
+        
         async function renderLinks() {
+            // Wait for storage to be available
+            await waitForStorage();
+            
             const container = document.getElementById('links-container');
             let linksCatalog = [];
             
-            // Try to load from storage
-            try {
-                const linksData = await window.storage.get('site-links');
-                if (linksData && linksData.value) {
-                    linksCatalog = JSON.parse(linksData.value);
-                }
-            } catch (error) {
-                console.log('No links in storage');
-            }
+            const linksCatalog = filteredLinks;
+            updateLinkCount();
             
             if (linksCatalog.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state" style="grid-column: 1 / -1;">
-                        <div class="empty-state-icon">🔗</div>
-                        <p>No links yet. Add some in the admin panel!</p>
-                    </div>
-                `;
+                const hasFilters = document.getElementById('links-search').value || 
+                                 document.getElementById('link-category-filter').value !== 'all';
+                
+                if (hasFilters) {
+                    container.innerHTML = `
+                        <div class="empty-state" style="grid-column: 1 / -1;">
+                            <div class="empty-state-icon">🔍</div>
+                            <p>No links found with current filters</p>
+                            <p style="font-size: 14px; margin-top: 8px;">Try adjusting your search or filters</p>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <div class="empty-state" style="grid-column: 1 / -1;">
+                            <div class="empty-state-icon">🔗</div>
+                            <p>No links yet. Add some in the settings!</p>
+                        </div>
+                    `;
+                }
                 return;
             }
             
@@ -152,6 +371,24 @@
                 const card = createLinkCard(link);
                 container.appendChild(card);
             });
+        }
+        
+        async function loadLinks() {
+            await waitForStorage();
+            
+            try {
+                const linksData = await window.storage.get('site-links');
+                if (linksData && linksData.value) {
+                    allLinks = JSON.parse(linksData.value);
+                    filteredLinks = [...allLinks];
+                }
+            } catch (error) {
+                console.log('No links in storage');
+                allLinks = [];
+                filteredLinks = [];
+            }
+            
+            filterAndRenderLinks();
         }
         
         function createLinkCard(link) {
@@ -211,7 +448,68 @@
             return '🔗';
         }
         
-        renderLinks();
+        // Search and filter functionality
+        document.getElementById('links-search').addEventListener('input', filterAndRenderLinks);
+        document.getElementById('link-category-filter').addEventListener('change', filterAndRenderLinks);
+        document.getElementById('link-sort').addEventListener('change', filterAndRenderLinks);
+        
+        // Settings button handler
+        document.getElementById('settings-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'admin.html';
+        });
+        
+        // Initialize on DOM ready
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadLinks();
+            
+            // Setup real-time sync - listen for link changes
+            if (window.storageEvents) {
+                window.storageEvents.on('site-links', async (value) => {
+                    console.log('🔗 Links updated in storage, reloading...');
+                    await loadLinks();
+                });
+            }
+        });
+        
+        // Also call immediately if DOM already loaded
+        if (document.readyState === 'loading') {
+            // Already added listener above
+        } else {
+            loadLinks();
+        }
+        
+        // Initialize pull-to-refresh
+        if (window.pullToRefresh) {
+            window.pullToRefresh.init(() => {
+                // Reload links on pull-to-refresh
+                loadLinks();
+            });
+        }
     </script>
+
+    <script src="js/mobile-header.js" defer></script>
+    <script src="js/ui-polish.js" defer></script>
+
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav">
+        <a href="index.html" class="mobile-nav-item">
+            <span class="mobile-nav-icon">📱</span>
+            <span>Feed</span>
+        </a>
+        <a href="files.html" class="mobile-nav-item">
+            <span class="mobile-nav-icon">📁</span>
+            <span>Files</span>
+        </a>
+
+        <a href="links.html" class="mobile-nav-item active">
+            <span class="mobile-nav-icon">🔗</span>
+            <span>Links</span>
+        </a>
+        <a href="admin.html" class="mobile-nav-item">
+            <span class="mobile-nav-icon">⚙️</span>
+            <span>Settings</span>
+        </a>
+    </nav>
 </body>
 </html>

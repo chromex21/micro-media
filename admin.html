@@ -3,28 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Lite Media</title>
+    <title>Settings - Lite Media</title>
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/file-upload.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/file-preview.css">
+    <link rel="stylesheet" href="css/files-view.css">
+    <script src="js/storage-polyfill.js"></script>
+    <script src="js/storage-events.js"></script>
     <style>
-        .admin-wrapper {
+        .settings-content {
             max-width: 1200px;
-            margin: 0 auto;
-            padding: var(--spacing-xl);
+            padding: var(--spacing-lg);
         }
         
-        .admin-header {
+        .settings-header {
             margin-bottom: var(--spacing-xl);
             padding-bottom: var(--spacing-lg);
             border-bottom: 2px solid var(--border-color);
         }
         
-        .admin-header h1 {
+        .settings-header h1 {
             font-size: 28px;
             margin-bottom: var(--spacing-sm);
         }
         
-        .admin-header p {
+        .settings-header p {
             color: var(--text-secondary);
             font-size: 16px;
         }
@@ -278,477 +284,543 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        /* Compact Media Grid */
+        .media-item-compact {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            transition: box-shadow 0.2s;
+        }
+
+        .media-item-compact:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .media-preview-small {
+            width: 80px;
+            height: 80px;
+            flex-shrink: 0;
+            background: #000;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .media-preview-small img,
+        .media-preview-small video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .media-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .media-filename-small {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .media-meta-small {
+            font-size: 14px;
+        }
+
+        .text-muted {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .media-actions {
+            display: flex;
+            gap: var(--spacing-xs);
+        }
+
+        .btn-icon {
+            padding: 8px 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        .btn-icon:hover {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .btn-icon.btn-danger:hover {
+            background: #dc3545;
+            border-color: #dc3545;
+        }
+
+        /* Edit Modal */
+        .edit-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-lg);
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .edit-modal.closing {
+            animation: fadeOut 0.2s ease-out forwards;
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        .edit-modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        .edit-modal-content {
+            position: relative;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .edit-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .edit-modal-header h3 {
+            font-size: 20px;
+            margin: 0;
+        }
+
+        .modal-close-btn {
+            font-size: 32px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            line-height: 1;
+        }
+
+        .modal-close-btn:hover {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .edit-modal-body {
+            padding: var(--spacing-lg);
+        }
+
+        .edit-preview {
+            margin-bottom: var(--spacing-md);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            background: #000;
+        }
+
+        .edit-filename {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-lg);
+            word-break: break-all;
+        }
+
+        .edit-form .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: flex-end;
+            margin-top: var(--spacing-xl);
+        }
     </style>
 </head>
 <body>
-    <div class="admin-wrapper">
-        <div class="admin-header">
-            <h1>⚙️ Lite Media Admin Panel</h1>
-            <p>Manage your entire site - All changes save automatically!</p>
-        </div>
-        
-        <div id="alert-container"></div>
-        
-        <div class="tabs">
-            <button class="tab active" onclick="switchTab('gallery')">🎬 Gallery</button>
-            <button class="tab" onclick="switchTab('files')">📁 Files</button>
-            <button class="tab" onclick="switchTab('links')">🔗 Links</button>
-            <button class="tab" onclick="switchTab('about')">ℹ️ About</button>
-        </div>
-        
-        <!-- GALLERY TAB -->
-        <div id="gallery-tab" class="tab-content active">
-            <div class="stats">
-                <div class="stat-card">
-                    <div class="stat-number" id="video-count">0</div>
-                    <div class="stat-label">Videos</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="image-count">0</div>
-                    <div class="stat-label">Images</div>
-                </div>
+    <div class="app">
+        <button class="sidebar-toggle" type="button" aria-label="Toggle navigation">☰</button>
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h1 class="site-logo">
+                    <span class="logo-icon">▶</span>
+                    <span class="logo-text">Lite Media</span>
+                </h1>
             </div>
-            
-            <div class="section">
-                <h2>📹 Videos</h2>
-                <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: var(--spacing-md);">
-                    Add video files to <code>media/videos/sd/</code> folder, then click scan to add them here.
-                </p>
-                <button class="btn" onclick="scanForNewMedia()" style="margin-bottom: var(--spacing-md);">
-                    🔄 Scan for New Videos & Images
-                </button>
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="index.html" class="nav-link">Feed</a>
+                </li>
+                <li class="nav-item">
+                    <a href="files.html" class="nav-link">Files</a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="links.html" class="nav-link">Links</a>
+                </li>
+                <li class="nav-item" style="margin-top: auto; padding-top: var(--spacing-xl); border-top: 1px solid var(--border-color);">
+                    <a href="admin.html" class="nav-link nav-link--active">⚙️ Settings</a>
+                </li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <div class="settings-content">
+                <div class="settings-header">
+                    <h1>⚙️ Settings</h1>
+                    <p>Manage your entire site - All changes save automatically!</p>
+                </div>
                 
-                <div id="videos-grid" class="media-grid"></div>
-            </div>
-            
-            <div class="section">
-                <h2>🖼️ Images</h2>
-                <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: var(--spacing-md);">
-                    Add image files to <code>media/images/full/</code> folder, then use the scan button above.
-                </p>
+                <div id="alert-container"></div>
                 
-                <div id="images-grid" class="media-grid"></div>
-            </div>
-        </div>
-        
-        <!-- FILES TAB -->
-        <div id="files-tab" class="tab-content">
-            <div class="section">
-                <h2>📄 Files Management</h2>
-                <button class="btn" onclick="addNewFile()" style="margin-bottom: var(--spacing-md);">➕ Add New File</button>
-                <div id="files-list"></div>
-            </div>
-        </div>
-        
-        <!-- LINKS TAB -->
-        <div id="links-tab" class="tab-content">
-            <div class="section">
-                <h2>🔗 Links</h2>
-                <button class="btn" onclick="addNewLink()" style="margin-bottom: var(--spacing-md);">➕ Add New Link</button>
-                <div id="links-list"></div>
-            </div>
-        </div>
-        
-        <!-- ABOUT TAB -->
-        <div id="about-tab" class="tab-content">
-            <div class="section">
-                <h2>ℹ️ About Page</h2>
-                <div class="form-group">
-                    <label>About Content (HTML supported)</label>
-                    <textarea id="about-content" rows="15" placeholder="Write about yourself or your site..."></textarea>
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('gallery')">🎬 Feed</button>
+                    <button class="tab" onclick="switchTab('filemanagement')">📁 File Management</button>
+                    <button class="tab" onclick="switchTab('links')">🔗 Links</button>
+                    <button class="tab" onclick="switchTab('sources')">📡 Content Sources</button>
+                    <button class="tab" onclick="switchTab('siteconfig')">⚙️ Site Configuration</button>
+                    <!-- Account tab will be added dynamically by auth.js -->
                 </div>
-                <button class="btn" onclick="saveAbout()">💾 Save About Page</button>
+                
+                <!-- GALLERY TAB -->
+                <div id="gallery-tab" class="tab-content active">
+                    <div class="stats">
+                        <div class="stat-card">
+                            <div class="stat-number" id="video-count">0</div>
+                            <div class="stat-label">Videos</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="image-count">0</div>
+                            <div class="stat-label">Images</div>
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h2>📹 Videos</h2>
+                        <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: var(--spacing-md);">
+                            Add video files to <code>media/videos/sd/</code> folder, then click scan to add them here.
+                        </p>
+                        <button class="btn" onclick="window.adminGallery.scanForNewMedia()" style="margin-bottom: var(--spacing-md);">
+                            🔄 Scan for New Videos & Images
+                        </button>
+                        
+                        <div id="videos-grid" class="media-grid"></div>
+                    </div>
+                    
+                    <div class="section">
+                        <h2>🖼️ Images</h2>
+                        <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: var(--spacing-md);">
+                            Add image files to <code>media/images/full/</code> folder, then use the scan button above.
+                        </p>
+                        
+                        <div id="images-grid" class="media-grid"></div>
+                    </div>
+                    
+                    <div class="section">
+                        <h2>☁️ Cloud Storage Media</h2>
+                        <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: var(--spacing-md);">
+                            Add public links from Dropbox, Google Drive, OneDrive, YouTube, or other cloud services to your feed.
+                        </p>
+                        <button class="btn" onclick="window.adminGallery.addNewCloudMedia()" style="margin-bottom: var(--spacing-md);">
+                            ➕ Add Cloud Link to Feed
+                        </button>
+                        
+                        <div id="cloud-media-grid" class="media-grid"></div>
+                    </div>
+                </div>
+                
+                <!-- FILE MANAGEMENT TAB -->
+                <div id="filemanagement-tab" class="tab-content">
+                    <div class="section">
+                        <h2>📄 Upload New Files</h2>
+                        <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: var(--spacing-md);">
+                            Upload documents, PDFs, or any files you want to share. Maximum 100MB per file.
+                        </p>
+                        <div id="file-uploader"></div>
+                    </div>
+                    
+                    <div class="section">
+                        <h2>📁 Uploaded Files</h2>
+                        <div id="files-list"></div>
+                    </div>
+                </div>
+                
+                <!-- LINKS TAB -->
+                <div id="links-tab" class="tab-content">
+                    <div class="section">
+                        <h2>🔗 Links</h2>
+                        <button class="btn" onclick="window.adminGallery.addNewLink()" style="margin-bottom: var(--spacing-md);">➕ Add New Link</button>
+                        <div id="links-list"></div>
+                    </div>
+                </div>
+                
+                <!-- CONTENT SOURCES TAB -->
+                <div id="sources-tab" class="tab-content">
+                    <div class="section">
+                        <h2>📡 Auto-Import Content</h2>
+                        <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: var(--spacing-lg);">
+                            Automatically pull in content from RSS feeds, APIs, and external sources. Your feed will update automatically!
+                        </p>
+                        
+                        <div class="alert alert-info" style="margin-bottom: var(--spacing-lg);">
+                            <strong>🚀 Pro Tip:</strong> Add your favorite blogs, news sites, YouTube channels, or social media accounts to automatically populate your feed with fresh content.
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--spacing-md); margin-bottom: var(--spacing-xl);">
+                            <button class="btn" onclick="window.contentSources.addRSSFeed()" style="padding: 16px; font-size: 15px;">
+                                📢 Add RSS Feed
+                            </button>
+                            <button class="btn" onclick="window.contentSources.addYouTubeChannel()" style="padding: 16px; font-size: 15px; background: #FF0000;">
+                                🎬 Add YouTube Channel
+                            </button>
+                            <button class="btn" onclick="window.contentSources.addCustomAPI()" style="padding: 16px; font-size: 15px; background: #667eea;">
+                                🔌 Add Custom API
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h2>📥 Active Content Sources</h2>
+                        <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: var(--spacing-md);">
+                            <span id="sources-count">0</span> active sources • Last updated: <span id="last-sync">Never</span>
+                        </p>
+                        
+                        <button class="btn" onclick="window.contentSources.syncAll()" style="margin-bottom: var(--spacing-md);">
+                            🔄 Sync All Sources Now
+                        </button>
+                        
+                        <div id="sources-list"></div>
+                    </div>
+                    
+                    <div class="section">
+                        <h2>⚙️ Sync Settings</h2>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="auto-sync" checked> 
+                                <span style="margin-left: 8px;">Auto-sync every hour</span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="show-source-label" checked> 
+                                <span style="margin-left: 8px;">Show source label on imported content</span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label for="max-items">Max items per source</label>
+                            <input type="number" id="max-items" value="10" min="1" max="100" style="width: 100px;">
+                        </div>
+                        <button class="btn" onclick="window.contentSources.saveSettings()">
+                            💾 Save Sync Settings
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- SITE CONFIGURATION TAB -->
+                <div id="siteconfig-tab" class="tab-content">
+                    <div class="section">
+                        <h2>🌐 Site Configuration</h2>
+                        <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: var(--spacing-lg);">
+                            Customize your site name and description. Changes are saved automatically.
+                        </p>
+                        
+                        <div class="form-group">
+                            <label for="site-name">Site Name</label>
+                            <input 
+                                type="text" 
+                                id="site-name" 
+                                placeholder="Lite Media"
+                                style="padding: 12px; font-size: 14px;"
+                            >
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="site-desc">Site Description</label>
+                            <textarea 
+                                id="site-desc" 
+                                rows="3" 
+                                placeholder="Personal media gallery"
+                                style="padding: 12px; font-size: 14px;"
+                            ></textarea>
+                        </div>
+                        
+                        <button class="btn" onclick="window.uiPolish.saveSiteConfig()" style="font-size: 14px; padding: 12px 24px;">
+                            💾 Save Settings
+                        </button>
+                    </div>
+                    
+                    <div class="section">
+                        <h2>🗑️ Danger Zone</h2>
+                        <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: var(--spacing-md);">
+                            Irreversible actions. Use with caution.
+                        </p>
+                        <button class="btn btn-danger" onclick="window.adminGallery.clearAllData()" style="font-size: 14px; padding: 12px 24px;">
+                            🗑️ Clear All Data
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Account tab will be added dynamically by auth.js after login -->
             </div>
-        </div>
+        </main>
     </div>
     
     <div class="save-indicator" id="save-indicator">✓ Saved!</div>
     
+    <script src="js/auth.js"></script>
+    <script src="js/custom-modal.js"></script>
     <script src="js/media-catalog.js"></script>
+    <script src="js/file-upload.js"></script>
+    <script src="js/file-preview.js"></script>
+    <script src="js/files-view-toggle.js"></script>
+    <script src="js/admin-gallery.js"></script>
+    <script src="js/content-sources.js"></script>
+    <script src="js/ui-polish.js"></script>
     <script>
-        let siteData = {
-            videos: [],
-            images: [],
-            links: [],
-            files: [],
-            about: ''
-        };
-        
-        async function init() {
-            await loadFromStorage();
-            updateStats();
-        }
-        
-        async function loadFromStorage() {
-            try {
-                const videosData = await window.storage.get('media-videos');
-                if (videosData && videosData.value) {
-                    siteData.videos = JSON.parse(videosData.value);
-                } else {
-                    await loadFromCatalog();
-                }
-                
-                const imagesData = await window.storage.get('media-images');
-                if (imagesData && imagesData.value) {
-                    siteData.images = JSON.parse(imagesData.value);
-                }
-                
-                const linksData = await window.storage.get('site-links');
-                if (linksData && linksData.value) {
-                    siteData.links = JSON.parse(linksData.value);
-                }
-                
-                const filesData = await window.storage.get('site-files');
-                if (filesData && filesData.value) {
-                    siteData.files = JSON.parse(filesData.value);
-                }
-                
-                const aboutData = await window.storage.get('site-about');
-                if (aboutData && aboutData.value) {
-                    siteData.about = aboutData.value;
-                    document.getElementById('about-content').value = siteData.about;
-                }
-                
-                renderAll();
-                showAlert(`✅ Loaded ${siteData.videos.length} videos, ${siteData.images.length} images, ${siteData.links.length} links!`, 'success');
-            } catch (error) {
-                console.error('Storage error:', error);
-                showAlert('⚠️ Loading from catalog...', 'info');
-                await loadFromCatalog();
-            }
-        }
-        
-        async function loadFromCatalog() {
-            if (typeof mediaCatalog !== 'undefined') {
-                siteData.videos = [];
-                siteData.images = [];
-                
-                if (mediaCatalog.videos) {
-                    mediaCatalog.videos.forEach(item => {
-                        if (typeof item === 'string') {
-                            siteData.videos.push({ file: item, title: '', desc: '' });
-                        } else {
-                            siteData.videos.push({
-                                file: item.file,
-                                title: item.title || '',
-                                desc: item.desc || ''
-                            });
-                        }
-                    });
-                }
-                
-                if (mediaCatalog.images) {
-                    mediaCatalog.images.forEach(item => {
-                        if (typeof item === 'string') {
-                            siteData.images.push({ file: item, title: '', desc: '' });
-                        } else {
-                            siteData.images.push({
-                                file: item.file,
-                                title: item.title || '',
-                                desc: item.desc || ''
-                            });
-                        }
-                    });
-                }
-                
-                await saveToStorage();
-                renderAll();
-                updateStats();
-            }
-        }
-        
-        async function saveToStorage() {
-            try {
-                await window.storage.set('media-videos', JSON.stringify(siteData.videos));
-                await window.storage.set('media-images', JSON.stringify(siteData.images));
-                await window.storage.set('site-links', JSON.stringify(siteData.links));
-                await window.storage.set('site-files', JSON.stringify(siteData.files));
-                await window.storage.set('site-about', siteData.about);
-                showSaveIndicator();
-                return true;
-            } catch (error) {
-                console.error('Save error:', error);
-                showAlert('❌ Failed to save. Please try again.', 'error');
-                return false;
-            }
-        }
-        
-        function showSaveIndicator() {
-            const indicator = document.getElementById('save-indicator');
-            indicator.classList.add('show');
-            setTimeout(() => indicator.classList.remove('show'), 2000);
-        }
-        
-        async function scanForNewMedia() {
-            showAlert('🔄 Scanning for new files...', 'info');
-            
-            if (typeof mediaCatalog !== 'undefined') {
-                const existingVideoFiles = new Set(siteData.videos.map(v => v.file));
-                const existingImageFiles = new Set(siteData.images.map(i => i.file));
-                
-                let newVideos = 0, newImages = 0;
-                
-                if (mediaCatalog.videos) {
-                    mediaCatalog.videos.forEach(item => {
-                        const filename = typeof item === 'string' ? item : item.file;
-                        if (!existingVideoFiles.has(filename)) {
-                            siteData.videos.push({
-                                file: filename,
-                                title: typeof item === 'object' ? (item.title || '') : '',
-                                desc: typeof item === 'object' ? (item.desc || '') : ''
-                            });
-                            newVideos++;
-                        }
-                    });
-                }
-                
-                if (mediaCatalog.images) {
-                    mediaCatalog.images.forEach(item => {
-                        const filename = typeof item === 'string' ? item : item.file;
-                        if (!existingImageFiles.has(filename)) {
-                            siteData.images.push({
-                                file: filename,
-                                title: typeof item === 'object' ? (item.title || '') : '',
-                                desc: typeof item === 'object' ? (item.desc || '') : ''
-                            });
-                            newImages++;
-                        }
-                    });
-                }
-                
-                if (newVideos > 0 || newImages > 0) {
-                    await saveToStorage();
-                    renderAll();
-                    updateStats();
-                    showAlert(`✅ Found ${newVideos} new video(s) and ${newImages} new image(s)!`, 'success');
-                } else {
-                    showAlert('✓ No new files found.', 'info');
-                }
-            }
-        }
-        
+        // Tab switching function
         function switchTab(tabName) {
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
             event.target.classList.add('active');
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             document.getElementById(tabName + '-tab').classList.add('active');
-        }
-        
-        function renderAll() {
-            renderVideos();
-            renderImages();
-            renderLinks();
-            renderFiles();
-        }
-        
-        function renderVideos() {
-            const grid = document.getElementById('videos-grid');
-            if (siteData.videos.length === 0) {
-                grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🎥</div><p>No videos yet.</p></div>';
-                return;
-            }
             
-            grid.innerHTML = '';
-            siteData.videos.forEach((video, index) => {
-                const item = document.createElement('div');
-                item.className = 'media-item';
-                item.innerHTML = `
-                    <div class="media-preview">
-                        <video src="media/videos/sd/${video.file}" muted></video>
-                    </div>
-                    <div class="media-filename">🎥 ${video.file}</div>
-                    <div class="form-group">
-                        <label>Title</label>
-                        <input type="text" value="${video.title || ''}" onchange="updateVideoTitle(${index}, this.value)">
-                    </div>
-                    <div class="form-group">
-                        <label>Description</label>
-                        <textarea onchange="updateVideoDesc(${index}, this.value)">${video.desc || ''}</textarea>
-                    </div>
-                    <button class="btn btn-danger btn-small" onclick="removeVideo(${index})">🗑️ Remove</button>
-                `;
-                grid.appendChild(item);
+            // Initialize file uploader when File Management tab is opened
+            if (tabName === 'filemanagement' && !window.fileUploaderInitialized) {
+                setTimeout(() => initFileUploader(), 100);
+            }
+        }
+        
+        // Wait for all dependencies to load
+        function waitForDependencies() {
+            return new Promise((resolve) => {
+                const checkInterval = setInterval(() => {
+                    const authReady = window.auth && typeof window.auth.isAuthenticated === 'function';
+                    const storageReady = window.storage && window.storage.get;
+                    const adminGalleryReady = window.adminGallery;
+                    const fileUploadReady = window.FileUploadManager;
+                    
+                    if (authReady && storageReady && adminGalleryReady && fileUploadReady) {
+                        clearInterval(checkInterval);
+                        resolve();
+                    }
+                }, 50);
+                // Timeout after 5 seconds
+                setTimeout(() => {
+                    clearInterval(checkInterval);
+                    resolve();
+                }, 5000);
             });
         }
         
-        function renderImages() {
-            const grid = document.getElementById('images-grid');
-            if (siteData.images.length === 0) {
-                grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🖼️</div><p>No images yet.</p></div>';
+        // Initialize everything after dependencies load
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Wait for all dependencies
+            await waitForDependencies();
+            
+            // Initialize file uploader if authenticated
+            if (window.auth && window.auth.isAuthenticated && window.auth.isAuthenticated()) {
+                initFileUploader();
+            }
+            
+            // Trigger initial render of admin gallery
+            if (window.adminGallery && window.adminGallery.render) {
+                window.adminGallery.render();
+            }
+        });
+        
+        function initFileUploader() {
+            const uploaderDiv = document.getElementById('file-uploader');
+            if (!uploaderDiv) {
+                console.warn('File uploader div not found');
                 return;
             }
             
-            grid.innerHTML = '';
-            siteData.images.forEach((image, index) => {
-                const item = document.createElement('div');
-                item.className = 'media-item';
-                item.innerHTML = `
-                    <div class="media-preview">
-                        <img src="media/images/full/${image.file}" alt="">
-                    </div>
-                    <div class="media-filename">🖼️ ${image.file}</div>
-                    <div class="form-group">
-                        <label>Title</label>
-                        <input type="text" value="${image.title || ''}" onchange="updateImageTitle(${index}, this.value)">
-                    </div>
-                    <div class="form-group">
-                        <label>Description</label>
-                        <textarea onchange="updateImageDesc(${index}, this.value)">${image.desc || ''}</textarea>
-                    </div>
-                    <button class="btn btn-danger btn-small" onclick="removeImage(${index})">🗑️ Remove</button>
-                `;
-                grid.appendChild(item);
-            });
-        }
-        
-        async function updateVideoTitle(index, value) {
-            siteData.videos[index].title = value;
-            await saveToStorage();
-        }
-        
-        async function updateVideoDesc(index, value) {
-            siteData.videos[index].desc = value;
-            await saveToStorage();
-        }
-        
-        async function updateImageTitle(index, value) {
-            siteData.images[index].title = value;
-            await saveToStorage();
-        }
-        
-        async function updateImageDesc(index, value) {
-            siteData.images[index].desc = value;
-            await saveToStorage();
-        }
-        
-        async function removeVideo(index) {
-            if (confirm('Remove this video?')) {
-                siteData.videos.splice(index, 1);
-                await saveToStorage();
-                renderVideos();
-                updateStats();
-            }
-        }
-        
-        async function removeImage(index) {
-            if (confirm('Remove this image?')) {
-                siteData.images.splice(index, 1);
-                await saveToStorage();
-                renderImages();
-                updateStats();
-            }
-        }
-        
-        function updateStats() {
-            document.getElementById('video-count').textContent = siteData.videos.length;
-            document.getElementById('image-count').textContent = siteData.images.length;
-        }
-        
-        async function addNewLink() {
-            const url = prompt('Enter link URL (including https://):');
-            if (!url) return;
-            const title = prompt('Enter link title:') || url;
-            const desc = prompt('Enter description (optional):') || '';
-            
-            siteData.links.push({ url, title, desc, image: '' });
-            await saveToStorage();
-            renderLinks();
-            showAlert('✅ Link added!', 'success');
-        }
-        
-        function renderLinks() {
-            const list = document.getElementById('links-list');
-            if (siteData.links.length === 0) {
-                list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔗</div><p>No links yet.</p></div>';
+            // Check if already initialized
+            if (window.fileUploaderInitialized) {
+                console.log('File uploader already initialized');
                 return;
             }
             
-            list.innerHTML = '';
-            siteData.links.forEach((link, index) => {
-                const item = document.createElement('div');
-                item.className = 'link-item';
-                item.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                        <strong>${link.title}</strong>
-                        <button class="btn btn-danger btn-small" onclick="removeLink(${index})">🗑️</button>
-                    </div>
-                    <div style="color: var(--text-secondary); font-size: 13px;">${link.url}</div>
-                    ${link.desc ? `<div style="margin-top: 8px; font-size: 13px;">${link.desc}</div>` : ''}
-                `;
-                list.appendChild(item);
+            const uploader = new FileUploadManager('file-uploader', {
+                maxFileSize: 100 * 1024 * 1024, // 100MB
+                multiple: true,
+                onComplete: async function(files) {
+                    // Save files to storage
+                    if (window.adminGallery && window.adminGallery.addUploadedFiles) {
+                        await window.adminGallery.addUploadedFiles(files);
+                    }
+                },
+                onError: function(error) {
+                    console.error('Upload error:', error);
+                }
             });
-        }
-        
-        async function removeLink(index) {
-            if (confirm('Remove this link?')) {
-                siteData.links.splice(index, 1);
-                await saveToStorage();
-                renderLinks();
-            }
-        }
-        
-        async function addNewFile() {
-            const name = prompt('File name (e.g., Document.pdf):');
-            if (!name) return;
-            const path = prompt('File path (e.g., files/Document.pdf):');
-            if (!path) return;
-            const desc = prompt('Description (optional):') || '';
-            const size = prompt('Size (e.g., 2.5 MB):') || '';
-            const type = name.split('.').pop().toLowerCase();
             
-            siteData.files.push({ name, path, desc, size, type });
-            await saveToStorage();
-            renderFiles();
-            showAlert('✅ File added!', 'success');
+            window.fileUploaderInitialized = true;
+            console.log('✅ File uploader initialized');
         }
-        
-        function renderFiles() {
-            const list = document.getElementById('files-list');
-            if (siteData.files.length === 0) {
-                list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📁</div><p>No files yet.</p></div>';
-                return;
-            }
-            
-            list.innerHTML = '';
-            siteData.files.forEach((file, index) => {
-                const item = document.createElement('div');
-                item.className = 'file-item';
-                item.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                        <strong>${file.name}</strong>
-                        <button class="btn btn-danger btn-small" onclick="removeFile(${index})">🗑️</button>
-                    </div>
-                    <div style="color: var(--text-secondary); font-size: 13px;">${file.path} ${file.size ? '• ' + file.size : ''}</div>
-                    ${file.desc ? `<div style="margin-top: 8px; font-size: 13px;">${file.desc}</div>` : ''}
-                `;
-                list.appendChild(item);
-            });
-        }
-        
-        async function removeFile(index) {
-            if (confirm('Remove this file?')) {
-                siteData.files.splice(index, 1);
-                await saveToStorage();
-                renderFiles();
-            }
-        }
-        
-        async function saveAbout() {
-            siteData.about = document.getElementById('about-content').value;
-            await saveToStorage();
-            showAlert('✅ About page saved!', 'success');
-        }
-        
-        function showAlert(message, type) {
-            const container = document.getElementById('alert-container');
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${type}`;
-            alert.textContent = message;
-            container.appendChild(alert);
-            setTimeout(() => alert.remove(), 5000);
-        }
-        
-        init();
     </script>
+
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav">
+        <a href="index.html" class="mobile-nav-item">
+            <span class="mobile-nav-icon">📱</span>
+            <span>Feed</span>
+        </a>
+        <a href="files.html" class="mobile-nav-item">
+            <span class="mobile-nav-icon">📁</span>
+            <span>Files</span>
+        </a>
+        <a href="links.html" class="mobile-nav-item">
+            <span class="mobile-nav-icon">🔗</span>
+            <span>Links</span>
+        </a>
+        <a href="admin.html" class="mobile-nav-item active">
+            <span class="mobile-nav-icon">⚙️</span>
+            <span>Settings</span>
+        </a>
+    </nav>
 </body>
 </html>

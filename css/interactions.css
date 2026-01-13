@@ -1,0 +1,92 @@
+/* Interactions System CSS - MINIMAL VERSION */
+
+:root {
+  --interaction-bg: transparent;
+  --reaction-idle: #2a2a2a;
+  --reaction-active: #3a3a3a;
+  --reaction-selected: #4a4a4a;
+  --interaction-text: #e0e0e0;
+  --interaction-text-dim: #999;
+  --tap-target: 40px;
+}
+
+/* Compact interactions container */
+.interactions {
+  padding: 8px 12px;
+  border-top: 1px solid #2a2a2a;
+}
+
+/* Reactions Row - Single compact line */
+.reactions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.reaction-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: var(--tap-target);
+  min-width: var(--tap-target);
+  padding: 6px 10px;
+  background: var(--reaction-idle);
+  border: 1px solid transparent;
+  border-radius: 20px;
+  color: var(--interaction-text);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.reaction-btn:active {
+  transform: scale(0.95);
+}
+
+.reaction-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.reaction-count {
+  color: var(--interaction-text-dim);
+  font-size: 12px;
+  min-width: 12px;
+  font-weight: 500;
+}
+
+/* Selected state - user picked this one */
+.reaction-btn.selected {
+  background: var(--reaction-selected);
+  border-color: #666;
+}
+
+/* Has votes state */
+.reaction-btn.has-count {
+  background: var(--reaction-active);
+}
+
+/* Mobile optimizations */
+@media (max-width: 480px) {
+  .interactions {
+    padding: 6px 10px;
+  }
+  
+  .reaction-btn {
+    padding: 5px 8px;
+    min-height: 36px;
+    min-width: 36px;
+  }
+  
+  .reaction-icon {
+    font-size: 16px;
+  }
+  
+  .reaction-count {
+    font-size: 11px;
+  }
+}
