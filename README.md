@@ -242,6 +242,8 @@ See **[TERMUX_GUIDE.md](TERMUX_GUIDE.md)** for detailed troubleshooting.
 
 ## 📚 Documentation
 
+- **[COMPLETE_AUTOMATION_GUIDE.md](COMPLETE_AUTOMATION_GUIDE.md)** - 🤖 Full automation setup
+- **[WORKFLOW_DIAGRAM.md](WORKFLOW_DIAGRAM.md)** - 📊 Visual workflow overview
 - **[TERMUX_GUIDE.md](TERMUX_GUIDE.md)** - Complete Termux setup guide
 - **[BACKEND_GUIDE.md](BACKEND_GUIDE.md)** - Backend architecture
 - **[UI_POLISH_COMPLETE.md](UI_POLISH_COMPLETE.md)** - UI improvements

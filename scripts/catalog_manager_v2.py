@@ -11,18 +11,34 @@ from pathlib import Path
 from datetime import datetime
 from typing import List, Dict, Optional
 
+# Import configuration
+try:
+    from config import get_media_path, get_data_path, print_config
+    USE_CONFIG = True
+except ImportError:
+    USE_CONFIG = False
+
 class MediaCatalog:
     """Medium-tier content management with boot sequence support"""
     
     def __init__(self, base_path: str = ".."):
         """Initialize CMS with base path"""
         self.base_path = Path(base_path).resolve()
-        self.media_path = self.base_path / "media"
-        self.videos_path = self.media_path / "videos" / "sd"
-        self.images_path = self.media_path / "images" / "full"
+        
+        # Use configuration if available, otherwise fall back to defaults
+        if USE_CONFIG:
+            print("📋 Using configuration from config.py")
+            self.videos_path = get_media_path('videos')
+            self.images_path = get_media_path('images')
+            self.data_path = get_data_path()
+        else:
+            print("📋 Using default paths")
+            self.media_path = self.base_path / "media"
+            self.videos_path = self.media_path / "videos" / "sd"
+            self.images_path = self.media_path / "images" / "full"
+            self.data_path = self.base_path / "data"
         
         # MEDIUM TIER: Single source of truth
-        self.data_path = self.base_path / "data"
         self.media_json = self.data_path / "media.json"
         self.boot_status_json = self.data_path / "boot_status.json"
         

@@ -1,73 +1,8 @@
 {
-  "videos": [
-    {
-      "id": "v_20260112_001",
-      "type": "video",
-      "file": "0107.mp4",
-      "path": "media/videos/sd/0107.mp4",
-      "title": "0107",
-      "desc": "",
-      "created": 1736640000
-    },
-    {
-      "id": "v_20260112_002",
-      "type": "video",
-      "file": "vid (1).mp4",
-      "path": "media/videos/sd/vid (1).mp4",
-      "title": "Vid 1",
-      "desc": "",
-      "created": 1736640100
-    },
-    {
-      "id": "v_20260112_003",
-      "type": "video",
-      "file": "vid (2).mp4",
-      "path": "media/videos/sd/vid (2).mp4",
-      "title": "Vid 2",
-      "desc": "",
-      "created": 1736640200
-    },
-    {
-      "id": "v_20260112_004",
-      "type": "video",
-      "file": "vid (3).mp4",
-      "path": "media/videos/sd/vid (3).mp4",
-      "title": "Vid 3",
-      "desc": "",
-      "created": 1736640300
-    }
-  ],
-  "images": [
-    {
-      "id": "i_20260112_001",
-      "type": "image",
-      "file": "ChatGPT Image Jan 7, 2026, 08_41_21 AM.png",
-      "path": "media/images/full/ChatGPT Image Jan 7, 2026, 08_41_21 AM.png",
-      "title": "ChatGPT Image Jan 7 2026 08 41 21 AM",
-      "desc": "",
-      "created": 1736239281
-    },
-    {
-      "id": "i_20260112_002",
-      "type": "image",
-      "file": "ChatGPT Image Jan 7, 2026, 08_44_10 AM.png",
-      "path": "media/images/full/ChatGPT Image Jan 7, 2026, 08_44_10 AM.png",
-      "title": "ChatGPT Image Jan 7 2026 08 44 10 AM",
-      "desc": "",
-      "created": 1736239450
-    },
-    {
-      "id": "i_20260112_003",
-      "type": "image",
-      "file": "ChatGPT Image Jan 7, 2026, 08_46_29 AM.png",
-      "path": "media/images/full/ChatGPT Image Jan 7, 2026, 08_46_29 AM.png",
-      "title": "ChatGPT Image Jan 7 2026 08 46 29 AM",
-      "desc": "",
-      "created": 1736239589
-    }
-  ],
+  "videos": [],
+  "images": [],
   "cloud_links": [],
   "deleted": [],
   "version": 1,
-  "last_updated": "2026-01-13T09:19:56.746921"
+  "last_updated": "2026-01-13T17:18:44.885629"
 }
